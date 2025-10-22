@@ -47,6 +47,8 @@ class ResumeController extends Controller
             'projects.*.period' => ['nullable', 'string', 'max:255'],
             'projects.*.description' => ['nullable', 'string', 'max:255'],
             'projects.*.link' => ['nullable', 'url', 'max:255'],
+            'projects.*.achievements' => ['nullable', 'array'],
+            'projects.*.achievements.*' => ['required', 'string'],
 
             // educ data
             'education' => ['nullable', 'array'],

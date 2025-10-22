@@ -87,41 +87,48 @@
                         
                         {{-- Projects Section - Powered by Alpine.js --}}
                         <div x-data='{
-                            projects: {{ json_encode(old('projects', $user->projects ?? [['title' => '', 'period' => '', 'description' => '', 'link' => '']])) }}
+                            projects: {{ json_encode(old('projects', $user->projects ?? [['title' => '', 'period' => '', 'description' => '', 'link' => '', 'achievements' => ['']]])) }}
                         }'>
                             <h3 class="text-lg font-medium">Projects</h3>
+                            <p class="text-sm text-gray-500">Add your professional projects. The first achievement is required if the project is filled.</p>
 
-                            {{-- This is a template for a single project form. Alpine will use this to create new ones. --}}
-                            <template x-for="(project, index) in projects" :key="index">
-                                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6 mt-4 p-4 border rounded-md">
+
+                            <template x-for="(project, p_index) in projects" :key="p_index">
+                                <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6 mt-4 p-4 border rounded-md relative">
                                     
-                                    {{-- Input for Project Title --}}
+                                    {{-- Inputs for Project Details --}}
                                     <div class="sm:col-span-6">
-                                        <label :for="'project_title_' + index" class="block text-sm font-medium text-gray-700">Project Title</label>
-                                        <input type="text" :name="'projects[' + index + '][title]'" :id="'project_title_' + index" x-model="project.title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                        <label :for="'project_title_' + p_index" class="block text-sm font-medium text-gray-700">Project Title</label>
+                                        <input type="text" :name="'projects[' + p_index + '][title]'" :id="'project_title_' + p_index" x-model="project.title" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                     </div>
-
-                                    {{-- Input for Project Period --}}
                                     <div class="sm:col-span-3">
-                                        <label :for="'project_period_' + index" class="block text-sm font-medium text-gray-700">Period</label>
-                                        <input type="text" :name="'projects[' + index + '][period]'" :id="'project_period_' + index" x-model="project.period" placeholder="e.g., Oct 2024 – Dec 2024" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                        <label :for="'project_period_' + p_index" class="block text-sm font-medium text-gray-700">Period</label>
+                                        <input type="text" :name="'projects[' + p_index + '][period]'" :id="'project_period_' + p_index" x-model="project.period" placeholder="e.g., Oct 2024 – Dec 2024" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                     </div>
-
-                                    {{-- Input for Project Description --}}
                                     <div class="sm:col-span-3">
-                                        <label :for="'project_description_' + index" class="block text-sm font-medium text-gray-700">Description</label>
-                                        <input type="text" :name="'projects[' + index + '][description]'" :id="'project_description_' + index" x-model="project.description" placeholder="e.g., Java + MySQL console application" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                        <label :for="'project_description_' + p_index" class="block text-sm font-medium text-gray-700">Description</label>
+                                        <input type="text" :name="'projects[' + p_index + '][description]'" :id="'project_description_' + p_index" x-model="project.description" placeholder="e.g., Java + MySQL console application" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                     </div>
-                                    
-                                    {{-- Input for Project Link --}}
                                     <div class="sm:col-span-6">
-                                        <label :for="'project_link_' + index" class="block text-sm font-medium text-gray-700">Link</label>
-                                        <input type="url" :name="'projects[' + index + '][link]'" :id="'project_link_' + index" x-model="project.link" placeholder="https://github.com/..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
+                                        <label :for="'project_link_' + p_index" class="block text-sm font-medium text-gray-700">Link</label>
+                                        <input type="url" :name="'projects[' + p_index + '][link]'" :id="'project_link_' + p_index" x-model="project.link" placeholder="https://github.com/..." class="mt-1 block w-full border-gray-300 rounded-md shadow-sm">
                                     </div>
 
-                                    {{-- Button to Remove a Project --}}
+                                    {{-- Nested Section for Achievements --}}
+                                    <div class="sm:col-span-6 space-y-2">
+                                        <label class="block text-sm font-medium text-gray-700">Achievements</label>
+                                        <template x-for="(achievement, a_index) in project.achievements" :key="a_index">
+                                            <div class="flex items-center gap-2">
+                                                <input type="text" :name="'projects[' + p_index + '][achievements][' + a_index + ']'" x-model="project.achievements[a_index]" class="block w-full border-gray-300 rounded-md shadow-sm">
+                                                <button type="button" @click="project.achievements.splice(a_index, 1)" class="text-red-600 hover:text-red-800 text-sm">Remove</button>
+                                            </div>
+                                        </template>
+                                        <button type="button" @click="project.achievements.push('')" class="bg-gray-100 text-gray-700 px-3 py-1 rounded-md shadow-sm hover:bg-gray-200 text-sm">+ Add Achievement</button>
+                                    </div>
+
+                                    {{-- Button to Remove the entire Project block --}}
                                     <div class="sm:col-span-6">
-                                        <button type="button" @click="projects.splice(index, 1)" class="text-red-600 hover:text-red-800 text-sm">
+                                        <button type="button" @click="projects.splice(p_index, 1)" class="text-red-600 hover:text-red-800 text-sm font-semibold mt-2">
                                             Remove Project
                                         </button>
                                     </div>
@@ -130,7 +137,7 @@
 
                             {{-- Button to Add a New Project --}}
                             <div class="mt-4">
-                                <button type="button" @click="projects.push({ title: '', period: '', description: '', link: '' })" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md shadow-sm hover:bg-gray-300 text-sm">
+                                <button type="button" @click="projects.push({ title: '', period: '', description: '', link: '', achievements: [''] })" class="bg-gray-200 text-gray-800 px-4 py-2 rounded-md shadow-sm hover:bg-gray-300 text-sm">
                                     + Add Project
                                 </button>
                             </div>
